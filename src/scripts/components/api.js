@@ -17,7 +17,6 @@ export const getUserInfo = () => {
   }).then(getResponseData); // Проверяем успешность выполнения запроса
 };
 
-window.getUserInfo = getUserInfo;
 
 export const getCardList = () => {
   return fetch(`${config.baseUrl}/cards`, {
@@ -25,7 +24,6 @@ export const getCardList = () => {
   }).then(getResponseData);
 };
 
-window.getCardList = getCardList;
 
 export const setUserInfo = ({ name, about }) => {
   return fetch(`${config.baseUrl}/users/me`, {
