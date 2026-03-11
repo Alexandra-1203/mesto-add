@@ -10,6 +10,7 @@
     "picocolors": "^1.1.1",
     "picomatch": "^4.0.3",
     "postcss": "^8.5.6",
+    "react-scripts": "^5.0.1",
     "rollup": "^4.59.0",
     "source-map-js": "^1.2.1",
     "tinyglobby": "^0.2.15"
