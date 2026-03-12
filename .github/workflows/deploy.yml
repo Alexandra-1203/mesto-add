@@ -26,26 +26,6 @@ jobs:
       - name: Build project
         run: npm run build
 
-      # ДИАГНОСТИКА: Проверяем секреты (безопасно)
-      - name: Debug secrets info
-        run: |
-          echo "PUBLIC_PAGES_REPO: ${{ secrets.PUBLIC_PAGES_REPO != '' && 'set' || 'NOT SET' }}"
-          echo "PUBLIC_PAGES_TOKEN: ${{ secrets.PUBLIC_PAGES_TOKEN != '' && 'set' || 'NOT SET' }}"
-          echo "PUBLIC_PAGES_BRANCH: ${{ secrets.PUBLIC_PAGES_BRANCH != '' && secrets.PUBLIC_PAGES_BRANCH || 'main (default)' }}"
-
-      # ДИАГНОСТИКА: Проверяем содержимое dist
-      - name: Check build output
-        run: |
-          echo "Contents of ./dist:"
-          ls -la ./dist || echo "dist directory not found"
-
-      # ДИАГНОСТИКА: Тестовый пуш (без реального деплоя)
-      - name: Test git configuration
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          echo "Git configured successfully"
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
