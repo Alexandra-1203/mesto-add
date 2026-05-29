@@ -12,17 +12,19 @@ import {
   closeModalWindow,
   setCloseModalWindowEventListeners,
 } from "./components/modal.js";
-import { enableValidation } from "./components/validation.js";
 import {
   getUserInfo,
   getCardList,
   setUserInfo,
   setUserAvatar,
   addCard,
+  changeLikeCardStatus,
+  deletePost,
 } from "./components/api.js";
+import { enableValidation, clearValidation } from "./components/validation.js";
 
 // Создание объекта с настройками валидации
-export const validationSettings = {
+const validationSettings = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
   submitButtonSelector: ".popup__button",
@@ -144,8 +146,10 @@ const handleConfirmDelete = (evt) => {
   evt.preventDefault();
   const button = removeCardForm.querySelector(".popup__button");
   renderLoading(button, true);
-  deleteCard(currentDeleteCardElement, currentDeleteCardId)
+
+  deletePost({ _id: currentDeleteCardId })
     .then(() => {
+      deleteCard(currentDeleteCardElement);
       closeModalWindow(removeCardPopup);
       currentDeleteCardElement = null;
       currentDeleteCardId = null;
@@ -167,19 +171,28 @@ const handleCardFormSubmit = (evt) => {
           onDeleteCard: handleDeleteCard,
         }),
       );
+      closeModalWindow(cardFormModalWindow);
+      cardForm.reset();
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => renderLoading(button, false));
-  closeModalWindow(cardFormModalWindow);
 };
 
 const handleLike = (likeButton, cardId, isLiked, likeCountElement) => {
-  likeCard(likeButton, cardId, isLiked, likeCountElement).catch((err) =>
-    console.log(err),
-  );
+  changeLikeCardStatus(cardId, isLiked)
+    .then((updatedCard) => {
+      likeCard(
+        likeButton,
+        likeCountElement,
+        updatedCard.likes.length,
+        !isLiked,
+      );
+    })
+    .catch((err) => console.log(err));
 };
+
 // EventListeners
 profileForm.addEventListener("submit", handleProfileFormSubmit);
 cardForm.addEventListener("submit", handleCardFormSubmit);
@@ -226,14 +239,12 @@ const showStatistic = () => {
       }
 
       const users = [];
-      let usersCount = 0;
       let sumLikes = 0;
       const likes = {};
 
       cards.forEach((card) => {
         if (!users.includes(card.owner._id)) {
           users.push(card.owner._id);
-          usersCount += 1;
         }
         sumLikes += card.likes.length;
 
@@ -258,7 +269,7 @@ const showStatistic = () => {
         .map((card) => card.name);
 
       const statistic = {
-        allUsers: usersCount,
+        allUsers: users.length,
         allLikes: sumLikes,
         maxLikes: userMaxLikes.count,
         maxUser: userMaxLikes.name,
@@ -274,16 +285,19 @@ const showStatistic = () => {
 openProfileFormButton.addEventListener("click", () => {
   profileTitleInput.value = profileTitle.textContent;
   profileDescriptionInput.value = profileDescription.textContent;
+  clearValidation(validationSettings, profileForm);
   openModalWindow(profileFormModalWindow);
 });
 
 profileAvatar.addEventListener("click", () => {
   avatarForm.reset();
+  clearValidation(validationSettings, avatarForm);
   openModalWindow(avatarFormModalWindow);
 });
 
 openCardFormButton.addEventListener("click", () => {
   cardForm.reset();
+  clearValidation(validationSettings, cardForm);
   openModalWindow(cardFormModalWindow);
 });
 
@@ -315,5 +329,5 @@ Promise.all([getCardList(), getUserInfo()])
     });
   })
   .catch((err) => {
-    console.log(err); 
+    console.log(err);
   });

@@ -1,19 +1,14 @@
-import { clearValidation } from "./validation.js";
-import { validationSettings } from "../index.js";
-
 const handleEscUp = (evt) => {
   if (evt.key === "Escape") {
     const activePopup = document.querySelector(".popup_is-opened");
-    closeModalWindow(activePopup);
+    if (activePopup) {
+      closeModalWindow(activePopup);
+    }
   }
 };
 
 export const openModalWindow = (modalWindow) => {
   modalWindow.classList.add("popup_is-opened");
-  const formElement = modalWindow.querySelector(
-    validationSettings.formSelector,
-  );
-  clearValidation(validationSettings, formElement);
   document.addEventListener("keyup", handleEscUp);
 };
 
